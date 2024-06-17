@@ -1,103 +1,104 @@
-const globalState = {
-    num1: '',
-    num2: '',
-    operation: ''
-};
-
-let activeInput = null;
-
-document.getElementById('num1').addEventListener('focus', function() {
-    activeInput = this;
-});
-
-document.getElementById('num2').addEventListener('focus', function() {
-    activeInput = this;
-});
-
-document.getElementById('num1').addEventListener('blur', function() {
-    globalState.num1 = this.value;
-});
-
-document.getElementById('num2').addEventListener('blur', function() {
-    globalState.num2 = this.value;
-});
-
-document.getElementById('calculate').addEventListener('click', function() {
-    const num1 = parseFloat(globalState.num1);
-    const num2 = parseFloat(globalState.num2);
-    const operation = globalState.operation;
-
-    if (isNaN(num1) || isNaN(num2)) {
-        if (isNaN(num1) && isNaN(num2)) {
-            alert('Будь ласка, введіть обидва числа.');
-        } else if (isNaN(num1)) {
-            alert('Будь ласка, введіть Число 1.');
-        } else {
-            alert('Будь ласка, введіть Число 2.');
-        }
-        return;
+// 1. Enum
+// 1.1 Days
+var Days;
+(function (Days) {
+    Days[Days["Sunday"] = 0] = "Sunday";
+    Days[Days["Monday"] = 1] = "Monday";
+    Days[Days["Tuesday"] = 2] = "Tuesday";
+    Days[Days["Wednesday"] = 3] = "Wednesday";
+    Days[Days["Thursday"] = 4] = "Thursday";
+    Days[Days["Friday"] = 5] = "Friday";
+    Days[Days["Saturday"] = 6] = "Saturday";
+})(Days || (Days = {}));
+/*
+1.2 Функція getActivity, яка приймає день тижня як аргумент (з використанням enum)
+та повертає рекомендовану активність для цього дня
+*/
+function getActivity(day) {
+    switch (day) {
+        case Days.Sunday:
+            return "Проведи час на природі";
+        case Days.Monday:
+            return "Будь соціально активними";
+        case Days.Tuesday:
+            return "Будь фізично активним";
+        case Days.Wednesday:
+            return "Веди будь-яку діяльність, пов'язану з утворенням";
+        case Days.Thursday:
+            return "Вирішуй юридичні питання";
+        case Days.Friday:
+            return "Відпочивай та розважайся, проявляй почуття і благодійність";
+        case Days.Saturday:
+            return "Зупинися, задумайся, переглянь свої плани";
+        default:
+            return "Упс, день невідомий)";
     }
-
-    if (!['+', '-', '*', '/'].includes(operation)) {
-        alert('Будь ласка, введіть правильну операцію.');
-        return;
+}
+// 2 Дженерики
+// 2.1 Клас Queue<T>
+var Queue = /** @class */ (function () {
+    function Queue() {
+        this.items = [];
     }
-
-    let result;
-    switch (operation) {
-        case '+':
-            result = num1 + num2;
-            break;
-        case '-':
-            result = num1 - num2;
-            break;
-        case '*':
-            result = num1 * num2;
-            break;
-        case '/':
-            result = num1 / num2;
-            break;
-    }
-
-    alert('Результат: ' + result);
-});
-
-document.querySelectorAll('.keyboard button').forEach(button => {
-    button.addEventListener('click', function() {
-        const value = this.textContent;
-        if (value === 'Розрахувати' || value === 'Додати в кеш' || value === 'Показати кеш') return;
-        if (['+', '-', '*', '/'].includes(value)) {
-            document.getElementById('operation').value = value;
-            globalState.operation = value;
-        } else {
-            if (activeInput) {
-                activeInput.value += value;
-                if (activeInput.id === 'num1') {
-                    globalState.num1 = activeInput.value;
-                } else {
-                    globalState.num2 = activeInput.value;
-                }
-            }
-        }
-    });
-});
-
-document.getElementById('in-cache').addEventListener('click', function() {
-    const valueToCache = {
-        num1: globalState.num1,
-        num2: globalState.num2,
-        operation: globalState.operation
+    Queue.prototype.enqueue = function (item) {
+        this.items.push(item);
     };
-    localStorage.setItem('cache', JSON.stringify(valueToCache));
-    alert('Дані збережені в кеш.');
-});
-
-document.getElementById('out-cache').addEventListener('click', function() {
-    const cachedValue = localStorage.getItem('cache');
-    if (cachedValue) {
-        const parsedValue = JSON.parse(cachedValue);
-        console.log('Збережені дані:', parsedValue);
-    } else {
-        console.log('Збережених даних немає.');
+    Queue.prototype.dequeue = function () {
+        return this.items.shift();
+    };
+    return Queue;
+}());
+// 2.1.1 Перевірка класу Queue (з рядками)
+var stringQueue = new Queue();
+stringQueue.enqueue("Hello");
+stringQueue.enqueue("World");
+console.log(stringQueue.dequeue()); // виведе - Hello
+console.log(stringQueue.dequeue()); // виведе - World
+// 2.1.2 Перевірка класу Queue (з числами)
+var numberQueue = new Queue();
+numberQueue.enqueue(323);
+numberQueue.enqueue(456);
+console.log(numberQueue.dequeue()); // виведе - 323
+console.log(numberQueue.dequeue()); // виведе - 456
+/*
+3.1 Функція combine, яка буде комбінувати два значення
+(якщо обидва рядки - конкатенує їх, якщо числа - додавати,
+в інших випадках видає помилку)
+*/
+function combine(input1, input2) {
+    if (typeof input1 === 'string' && typeof input2 === 'string') {
+        return input1 + input2;
     }
-});
+    else if (typeof input1 === 'number' && typeof input2 === 'number') {
+        return input1 + input2;
+    }
+    else {
+        var newLocal = "Помилка";
+        throw new Error(newLocal);
+    }
+}
+// 3.2 Перевірка функції combine
+console.log(combine("Hello, ", "world!")); // Виведе "Hello, world!"
+console.log(combine(2, 20)); // Виведе 22
+console.log(combine("Hello", 10)); // Викине помилку
+// 4.2 Клас Employee
+var Employee = /** @class */ (function () {
+    function Employee(name, age, position, salary) {
+        this.name = name;
+        this.age = age;
+        this.position = position;
+        this.salary = salary;
+    }
+    Employee.prototype.getSalary = function () {
+        return this.salary;
+    };
+    Employee.prototype.setSalary = function (newSalary) {
+        this.salary = newSalary;
+    };
+    return Employee;
+}());
+// 4.3 Перевірка класу Employee
+var employee = new Employee("Oleg", 35, "Developer", 2000);
+console.log(employee.getSalary()); // Виведе 2000
+employee.setSalary(2500);
+console.log(employee.getSalary()); // Виведе 2500
